@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import User from "../models/UserModel.js";
 
 export const getUsers = async(req, res) => {
@@ -19,6 +20,26 @@ export const getUsersById = async(req, res) => {
         res.status(200).json(response);
     } catch (error) {
         console.log(error.message);
+    }
+}
+
+export const getUsersByName = async(req, res) => {
+    try {
+        const search = req.query.search_query || "";
+        const response = await User.findAll({
+            where:{
+                [Op.or]:[
+                    {name: {[Op.like]: "%" + search + "%"}},
+                    {email: {[Op.like]: "%" + search + "%"}},
+                ],
+            },
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send({
+            message: error.message
+        });
     }
 }
 
